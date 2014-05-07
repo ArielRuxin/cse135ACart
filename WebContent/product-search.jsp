@@ -1,10 +1,33 @@
-
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ACart: Manage Products</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Add custom CSS here -->
+    <link href="css/navbarstyle.css" rel="stylesheet">
+    <style>
+    body {
+        margin-top: 60px;
+    }
+    </style>
+</head>
 
 <d>
 <jsp:include page="/products.jsp" />
 </d>
+
 <body>
 		
 	<%
@@ -17,36 +40,7 @@
 			
 			}
 		}
-		/* if (action != null && action.equals("update")) {
-			session.setAttribute("cate", request.getParameter("category")); 
-		} */
-		
-		/* if (session.getAttribute("cate") == null){
-    	session.setAttribute("cate", request.getParameter("category"));
-    	cate = request.getParameter("category");
-		} */
-		boolean is = (session.getAttribute("realcate")==null);
 	%>
-	real<%=session.getAttribute("realcate") %>
-	bool?<%=is%>
-	cate<%=session.getAttribute("cate") %>
-	<%=action %>
-	<br>
-	Category:
-	<%
-	if((session.getAttribute("realcate")==null)) {
-	%>
-		All
-	<% 
-	} else {
-	%>
-	<%=session.getAttribute("realcate") %>
-	<% 
-	}
-	%>
-<table>
-    <tr>
-        <td>
             <%-- Import the java.sql package --%>
             <%@ page import="java.sql.*"%>
             <%-- -------- Open Connection Code -------- --%>
@@ -70,21 +64,12 @@
             %>
             
             <%-- -------- SELECT Statement Code -------- --%>
-            <%
-            
-            
+            <%           
                 // Create the statement
                 Statement statement = conn.createStatement();
                 // Use the created statement to SELECT
                 // the student attributes FROM the Student table.
-                rsCate = statement.executeQuery("SELECT name FROM categories"); 
-                /* 
-                pstmtL = conn.prepareStatement("SELECT * FROM products WHERE products.category = ?");
-                
-                pstmtL.setString(1, (String) (session.getAttribute("cate")));                   
-                rsC = pstmtL.executeQuery(); */
-             
-                
+                rsCate = statement.executeQuery("SELECT name FROM categories");                 
             %>
             
             <%-- -------- UPDATE Code -------- --%>
@@ -189,40 +174,52 @@
 					}
                 }
              %>
-             <!-- <table border="1">
-            <tr>
-            	<th>IDD</th>
-                <th>Name</th>
-                <th>SKU</th>
-                <th>Category</th>
-                <th>Price</th>
-            </tr> -->
+             
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+        
+	<table>
+	<tr><h4>
+		Category:
+		<%
+		if((session.getAttribute("realcate")==null)) {
+		%>
+			All
+		<% 
+		} else {
+		%>
+		<%=session.getAttribute("realcate") %>
+		<% 
+		}
+		%></h4>
+	</tr>
+    <tr>
+        <td>
+             
              <% 
-                if(
-/*                 		(!((String)(session.getAttribute("cate"))).equals("no")) && (rsC.next())
- */                		!(rsC.next())
- 						|| ((String)(session.getAttribute("cate"))).equals("no") && (request.getParameter("search").equals(""))
- 				){                
-                	%>
-                    Not found
-                    <% 
-                
-                } else {
+                if(!(rsC.next())|| ((String)(session.getAttribute("cate"))).equals("no") && (request.getParameter("search").equals("")))
+                { %>
+                    <p class="text-danger">No products in this category!</p>
+             <% } else {
                 // Iterate over the ResultSet
-                
-                %>
-                <table border="1">
+             %>
+           	<table class="table table-bordered table-hover">
+            <thead>    
             <tr>
-            	<th>IDD</th>
+            	<th>ID</th>
                 <th>Name</th>
                 <th>SKU</th>
                 <th>Category</th>
                 <th>Price</th>
-            </tr>
+                <th colspan="2">Action</th>
+            </tr></thead>
+            
+            <tbody>
                 <% 
                 rsC = pstmtL.executeQuery(); 
                 while (rsC.next()) {
-            %>
+            	%>
 
             <tr>
                 <form action="product-search.jsp" method="POST">
@@ -230,61 +227,52 @@
                     <input type="hidden" name="id" value="<%=rsC.getInt("id")%>"/>
 
                 <%-- Get the id --%>
-					<td>
-                    	<%=rsC.getInt("id")%>
-                	</td>
-                    <td>
-                    	<input value="<%=rsC.getString("name")%>" name="name" size="15"/>
-                	</td>
-                	<td>
-                    	<input value="<%=rsC.getInt("sku")%>" name="sku" size="10"/>
-                	</td>
-                	
-                    <td><select name="category">
-                    <option selected="<%=rsC.getString("category")%>"><%=rsC.getString("category")%></option>
-			 		<%	
+					<td><%=rsC.getInt("id")%></td>
+                    <td><input class="form-control" value="<%=rsC.getString("name")%>" name="name" size="15"/></td>
+                	<td><input class="form-control" value="<%=rsC.getInt("sku")%>" name="sku" size="10"/></td>               	
+                    <td><select name="category" class="form-control">
+                    	<option selected="<%=rsC.getString("category")%>"><%=rsC.getString("category")%></option>
+			 			<%	
 			 			rsCate = statement.executeQuery("SELECT name FROM categories"); 
 			 			while(rsCate.next()) {
 			 				if (!rsC.getString("category").equals(rsCate.getString("name"))){
-			  		%>
-			  		<option value=<%= rsCate.getString("name") %>><%= rsCate.getString("name")%></option>
-			  		<%
+			  			%>
+			  				<option value=<%= rsCate.getString("name") %>><%= rsCate.getString("name")%></option>
+			  				<%
 			  				}
 			 			}
 			   			%>
-					</select>
+						</select>
 					</td>
-                    <td>
-                    	<input value="<%=rsC.getFloat("price")%>" name="price" size="10"/>
-                	</td>
+                    <td><input class="form-control" value="<%=rsC.getFloat("price")%>" name="price" size="10"/></td>
 
-                <%-- Button --%>
-                <td><input type="submit" value="Update"></td>
+	                <%-- Button --%>
+	                <td><button type="submit" class="btn btn-primary btn-sm"><i class="icon-repeat"></i> Update</td>
                 </form>
                 
                 <form action="product-search.jsp" method="POST">
                 	<input type="hidden" name="action" value="delete"/>
                 	<input type="hidden" value="<%=rsC.getInt("id")%>" name="id"/>
-          			<td><input type="submit" value="Delete"/></td>     
+          			<td><button type="submit" class="btn btn-danger btn-sm"><i class="icon-trash"></i> Delete</button></td>
                 </form>
            
             </tr>
-            <%
-                }
-                } 
-            %>
+            <% } %>
+            </tbody>
+         <% } %>
             </table>
-			<% 
-           /*  }  */
-            %>
-            
-            
-            
-            
+            </td>
+            </tr>
+            </table>        
+            </div>
+            </div>
+            </div>
+
             
             <%-- -------- Close Connection Code -------- --%>
             <%
                 conn.close();
+            
             } catch (SQLException e) {
 
                 // Wrap the SQL exception in a runtime exception to propagate
@@ -323,10 +311,6 @@
                 }
             }
             %>
-        </table>
-        </td>
-    </tr>
-</table>
 </body>
 
 </html>

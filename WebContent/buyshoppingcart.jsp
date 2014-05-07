@@ -1,18 +1,18 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+<%@ page import="java.util.*, cartitem.*" language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+<html>
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="indexpage for ACart">
-    <meta name="author" content="Ariel&Charlie">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    <title>ACart: Online Shopping</title>
+    <title>ACart: Shopping Cart</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet">
 
     <!-- Add custom CSS here -->
@@ -24,8 +24,8 @@
     </style>
 
 </head>
- <body>
- 
+
+<body>
      <!-- nav bar -->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
@@ -81,21 +81,87 @@
         </div>
         <!-- /.container -->
     </nav>
-    
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <h2>Welcome to ACart online shopping!</h2>
-            </div>
-        </div>
 
-    </div>
-    <!-- /.container -->
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+   
+	<%-- -------- Retrieval code (already initialized students and nextPID) -------- --%>
+    <% 
+        // retrieves student data from session scope
+        LinkedHashMap<String, Cartitem> cartitem = (LinkedHashMap<String, Cartitem>)session.getAttribute("cartitem");
+    	if (session.getAttribute("itemnumber")==null || (Integer)(session.getAttribute("itemnumber")) == 1) {
+    		%>
+    			<p>The cart is empty. <a href="product-browse.jsp">Continue Shopping</a></p>
+    		<% 
+    	} else{
+        // retrieves the latest pid
+        Integer itemnumber = (Integer)(session.getAttribute("itemnumber"));
+    %>  
     
-	<!-- Bootstrap core JavaScript
+<table class="table">
+    <tr>
+        <td>
+            <!-- Add an HTML table header row to format the results -->
+            <table class="table table-bordered table-hover">
+            <thead><tr>
+            	<th>Product ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <!-- <th>Total</th> -->
+            </tr></thead>
+			<tbody>
+			<%-- -------- Iteration Code -------- --%>
+            <%
+                // loop through the student data
+                Iterator it = cartitem.entrySet().iterator();
+            	double total = 0;
+                while(it.hasNext()){
+                    // current element pair
+                    Map.Entry pair = (Map.Entry)it.next();
+            		%>
+		            <tr>
+		            	<td><%=((Cartitem)pair.getValue()).getNo()%></td>
+		                <td><%=((Cartitem)pair.getValue()).getItemname() %></td>
+		                <td>$ <%=((Cartitem)pair.getValue()).getPrice()%></td>
+		                <td><%=((Cartitem)pair.getValue()).getAmount()%></td>
+		                <td>$ <%=((Cartitem)pair.getValue()).getPrice() * ((Cartitem)pair.getValue()).getAmount()%></td>
+		            </tr>
+            		<%
+            	total += ((Cartitem)pair.getValue()).getPrice() * ((Cartitem)pair.getValue()).getAmount();
+                }
+			%>
+			<% session.setAttribute("totalprice", total); %>
+			</tbody>
+        </table>
+        </td>
+    </tr>
+</table>
+	<div>
+			<h4>Subtotal: $ <%=session.getAttribute("totalprice") %></h4>
+	</div>
+	<br />
+	<a href="product-browse.jsp">Keep Shopping </a>Or Enter Your Favorite Credit Card Number Here:
+	<br>
+	<form action="confirm.jsp" method="POST">
+    	<input type="hidden" name="action" value="pay"/>
+        <input class="form-control" value="" name="cardnumber" size="30"/>
+        <button type="submit" class="btn btn-default">Pay</button>
+    </form>
+
+<!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
- </body>
+
+</body>
+<%
+    	}
+%>
+
+
 </html>
+

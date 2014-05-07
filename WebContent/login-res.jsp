@@ -31,7 +31,11 @@
             <%@ page import="java.sql.*"%>
             <%-- -------- Open Connection Code -------- --%>
             <%
-            
+            if((session.getAttribute("username")==null) || (!(session.getAttribute("username")==null) && !((String)(session.getAttribute("username"))).equals(request.getParameter("username")))) {
+            	session.setAttribute("cartitem", null);
+                session.setAttribute("itemnumber", null);
+            }
+            	
             Connection conn = null;
             PreparedStatement pstmt = null;
             ResultSet rsUser = null;
@@ -50,27 +54,22 @@
 
             <%-- -------- SELECT Statement Code -------- --%>
             <%
-            String action = request.getParameter("action");
             loginuser = request.getParameter("username");
+
+            // Create the statement
+            pstmt = conn.prepareStatement("SELECT name, role FROM users WHERE users.name = ?");
+        	pstmt.setString(1, loginuser);    
+        	// Use the created statement to SELECT
+            // the student attributes FROM the Student table.
+         
+            rsUser = pstmt.executeQuery();
             
-            if (action != null && action.equals("checkuser")) {
-            
-                // Create the statement
-                pstmt = conn.prepareStatement("SELECT name, role FROM users WHERE users.name = ?");
-            	pstmt.setString(1, loginuser);    
-            // Use the created statement to SELECT
-                // the student attributes FROM the Student table.
-             
-                rsUser = pstmt.executeQuery(); 
-            }
-                
-            %>     
-                
-            <% 
             rsUser.next();
             
-        	session.setAttribute("username", rsUser.getString("name"));
-        	session.setAttribute("role", rsUser.getString("role"));
+        	if( !rsUser.getString("name").equals(null) ) {
+        		
+        		session.setAttribute("username", rsUser.getString("name"));
+        		session.setAttribute("role", rsUser.getString("role"));
             %>
             			            
 		    <!-- nav bar -->
@@ -89,12 +88,11 @@
 		        </div>
 		        <!-- /.container -->
 		    </nav>
-
-            
+           
             <div class="container">
 	        		<div class="row">
 	            		<div class="col-lg-12">
-							<h2>Hello <%= loginuser %>.<br> You have successfully login! </h2>
+							<h5>Hello <%= loginuser %>.<br> You have successfully login! </h5>
 						</div>
 					</div>
 					<div class="col-sm-offset-2 col-sm-10">
@@ -103,7 +101,7 @@
 				</div>
             
 			<%-- -------- Close Connection Code -------- --%>
-            <%
+            <% }
                 // Close the ResultSet
                 rsUser.close();     	
 
@@ -113,7 +111,7 @@
                 // Close the Connection
                 conn.close();
                 
-            } catch (Exception e) {
+            } catch (SQLException e) {
 			
                 // Wrap the SQL exception in a runtime exception to propagate
                 // it upwards
@@ -146,7 +144,13 @@
 				<form class="form-horizontal" role="form" action="login-res.jsp" method="GET">
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<p>The provided name <%=loginuser %> is not known</p>
+						<%		if((session.getAttribute("username")) == null) { %>
+             						<p>Please login first</p>
+             			<% 		} else if (((String)(session.getAttribute("username"))).equals("")){ %>
+             						<p>The provided name cannot be empty</p>
+             			<%		} else {%>
+									<p>The provided name <%=loginuser %> doesn't exist</p>
+						<% 		} %>
 						</div>
 					</div>
 				   <div class="form-group">

@@ -106,7 +106,7 @@
 			    <div class="container">
 	        		<div class="row">
 	            		<div class="col-lg-12">
-							<h2><i class="icon-music"></i> Congratulations! <%= username %>.<br> You have successfully signed up! </h2>
+							<h5><i class="icon-music"></i> Congratulations! <%= username %>.<br> You have successfully signed up! </h5>
 						</div>
 					</div>
 					<div class="col-sm-offset-2 col-sm-10">

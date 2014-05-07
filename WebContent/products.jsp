@@ -24,6 +24,8 @@
     </style>
 </head>
 
+<body>
+
 			<%-- Import the java.sql package --%>
             <%@ page import="java.sql.*"%>
             <%-- -------- Open Connection Code -------- --%>
@@ -59,8 +61,6 @@
              
                 
             %>
-
-<body>
 	
 	<!-- nav bar -->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -97,6 +97,7 @@
                     	<ul class="dropdown-menu">
 							<li><a href="categories.jsp">Manage categories</a></li>
 							<li><a href="products.jsp">Manage products</a></li>
+							<li><a href="login.jsp">Log out</a></li>
 						</ul>
                     </li>
         		
@@ -113,96 +114,100 @@
         <!-- /.container -->
     </nav>
 	
+	<div class="container">
+	<div class="row">
+	<div class="col-lg-12">
 	
-	<table>
-	           	<form action="product-search.jsp" method="POST">
-                    <input type="hidden" name="action" value="list"/>
-                    <input type="hidden" name="cate" value="no"/>
-                    <input value="" name="search" size="30"/>
-                    <input type="submit" value="Search"/>
-                </form>
-	    <tr>
-	        
-	        
-	        <td>
-		        <table border="1">
-		        <tr>
-		                <th>Categories</th>
-		        </tr>
-		        <tr>
+	<table>		
+	<tr>
+	   	<td rowspan="2">		        
+	        <!-- Category table -->
+	        <table class="table table-bordered table-hover">
+	        <thead><tr>
+	                <th> Categories	</th>
+	        </tr></thead>
+	        <tbody>
 		        	<%
 		        	while(rsCate.next()) {
 		        	String cur = rsCate.getString("name");
 		        	%>
-		        
+		        <tr>
 		        	<form action="product-search.jsp" method="POST">
 		        			<input type="hidden" name="action" value="list"/> 
 		        			<input type="hidden" name="cate" value="<%=rsCate.getString("name")%>"/>
-		                    <th><input type="submit" value="<%=rsCate.getString("name")%>"/></th>
+		                    <td><button type="submit" class="btn btn-link"><%=rsCate.getString("name")%></button></td>
 		        	</form>
 		        </tr>
 		        <%
 		        	}
 		        %>
-		        
+	        </tbody>
+	        <tfoot>	        
 		        <tr>
 		        	<form action="product-search.jsp" method="POST">
-		        			<input type="hidden" name="action" value="list"/> 
-		        			<input type="hidden" name="cate" value="All"/>
-		                    <th><input type="submit" value="All"/></th>
+		        		<input type="hidden" name="action" value="list"/> 
+		        		<input type="hidden" name="cate" value="All"/>
+		                <td><button type="submit" class="btn btn-default btn-sm">Show all</button></td>
 		        	</form>
 		        </tr>
-		        
-		        </table>
-	        </td>
-	        
-	        <td>
-            
-            
-            
-            
-            
-            <!-- Add an HTML table header row to format the results -->
-            
-            <table border="1">
-            <tr>
-            	<th>ID</th>
-                <th>Name</th>
-                <th>SKU</th>
-                <th>Category</th>
-                <th>Price</th>
-            </tr>
-
-            <tr>
-                <form action="products-res.jsp" method="POST">
-                    <input type="hidden" name="action" value="insert"/>
-                    <th>&nbsp;</th>
-                    <th><input value="" name="name" size="20"/></th>
-                    <th><input value="" name="sku" size="10"/></th>
-                    <th><select name="category">
-			 		<%	
-			 			rsCate = statement.executeQuery("SELECT name FROM categories"); 
-			 			while(rsCate.next()) {
-			  		%>
-			  		<option value=<%= rsCate.getString("name") %>><%= rsCate.getString("name")%></option>
-			  		<%
-			  		}
-			   			%>
-					</select>
-					</th>
-                    <th><input value="" name="price" size="10"/></th>
-                    <th><input type="submit" value="New Product"/></th>
-                </form>
-            </tr>
-            
-            </table>
-        </td>
+	        </tfoot>		        
+	        </table>		        
+	     </td>
+	     <td><div style="float:right">
+		     <form action="product-search.jsp" method="POST">
+                   <input type="hidden" name="action" value="list"/>
+                   <input type="hidden" name="cate" value="no"/>
+                   <div class="input-group">
+					<input type="text" class="form-control" placeholder="Search" size="30"/>
+     						<span class="input-group-btn">
+       						<button class="btn btn-default" type="submit"><i class="icon-search"></i> Search</button>
+     						</span>
+   				</div>
+               </form></div>	
+	    </td>
+	</tr>
+    <tr>
+    	<td>
+    		<div style="float:right">
+    		<!-- Insert product into category table -->
+	            <table class="table">
+	            <thead><tr>
+	                <th>Name</th>
+	                <th>SKU</th>
+	                <th>Category</th>
+	                <th>Price</th>
+	            </tr></thead>
+				<tbody>
+	            <tr>
+	                <form action="products-res.jsp" method="POST">
+	                    <input type="hidden" name="action" value="insert"/>
+	                    <td><input class="form-control" value="" name="name" size="20"/></td>
+	                    <td><input class="form-control" value="" name="sku" size="10"/></td>
+	                    <td><select class="form-control" name="category">
+				 		<%	
+				 			rsCate = statement.executeQuery("SELECT name FROM categories"); 
+				 			while(rsCate.next()) {
+				  		%>
+				  		<option value=<%= rsCate.getString("name") %>><%= rsCate.getString("name")%></option>
+				  		<%
+				  		}
+				   			%>
+						</select></td>
+	                    <td><input class="form-control" value="" name="price" size="10"/></th>
+	                    <td><button type="submit" class="btn btn-default btn-sm btn-primary" type="submit">Add New Product</button></td>
+	                </form>
+	            </tr>
+	            </tbody>
+	            </table>
+	    	</div>
+    	</td>
     </tr>
-            
-             
-       		
-       		
-            
+</table>
+        
+</div>
+</div>
+</div>
+        	
 
             <%-- -------- Close Connection Code -------- --%>
             <%
@@ -243,8 +248,6 @@
                 }
             }
             %>
-        
-</table>
 
 	<!-- Bootstrap core JavaScript
     ================================================== -->

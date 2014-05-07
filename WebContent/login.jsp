@@ -25,6 +25,13 @@
 
 </head>
 <body>
+	<%
+	session.setAttribute("username", null);
+	session.setAttribute("cartitem", null);
+	session.setAttribute("itemnumber", null);
+	session.setAttribute("totalprice", null);
+	%>
+	
     <!-- nav bar -->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">

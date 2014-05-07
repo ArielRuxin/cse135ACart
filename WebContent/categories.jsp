@@ -26,7 +26,7 @@
 </head> 
 
 <body>
-     <!-- nav bar -->
+<!-- nav bar -->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -61,6 +61,7 @@
                     	<ul class="dropdown-menu">
 							<li><a href="categories.jsp">Manage categories</a></li>
 							<li><a href="products.jsp">Manage products</a></li>
+							<li><a href="login.jsp">Log out</a></li>
 						</ul>
                     </li>
         		
@@ -69,7 +70,7 @@
         			<%}
             	}
             
-            %>                
+           %>                
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -77,7 +78,7 @@
         <!-- /.container -->
     </nav>
     
-            <%-- Import the java.sql package --%>
+    	<%-- Import the java.sql package --%>
             <%@ page import="java.sql.*"%>
             <%-- -------- Open Connection Code -------- --%>
             <%
@@ -97,7 +98,6 @@
                     "jdbc:postgresql://localhost/cse135?" +
                     "user=postgres&password=Hh_2010");
             %>
-            
             <%-- -------- INSERT Code -------- --%>
             <%
                 String action = request.getParameter("action");
@@ -112,7 +112,9 @@
                     pstmt = conn
                     .prepareStatement("INSERT INTO categories (name, description) VALUES (?, ?)");
 
-                    pstmt.setString(1, request.getParameter("name"));
+                    if(!request.getParameter("name").equals("")){
+                    	pstmt.setString(1, request.getParameter("name"));
+                    }
                     pstmt.setString(2, request.getParameter("description"));
                     int rowCount = pstmt.executeUpdate();
 
@@ -121,7 +123,6 @@
                     conn.setAutoCommit(true);
                 }
             %>
-            
             <%-- -------- UPDATE Code -------- --%>
             <%
                 // Check if an update is requested
@@ -135,7 +136,9 @@
                     pstmt = conn
                         .prepareStatement("UPDATE categories SET name = ?, description = ? WHERE id = ?");
 
-                    pstmt.setString(1, request.getParameter("name"));
+                    if(!request.getParameter("name").equals("")){
+                    	pstmt.setString(1, request.getParameter("name"));
+                    }
                     pstmt.setString(2, request.getParameter("description"));
                     pstmt.setInt(3, Integer.parseInt(request.getParameter("id")));
                     
@@ -181,12 +184,11 @@
                 pstmtNP = conn.prepareStatement("SELECT categories.name FROM categories WHERE categories.name NOT IN(SELECT category FROM products)");
                 rsNP = pstmtNP.executeQuery();
              %>
-            
-  
-		<div class="container">
-		<div class="row">          
-            <!-- Add an HTML table header row to format the results -->
-            <table class="table  table-bordered table-hover">     
+             
+    <div class="container">
+        <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-bordered">     
             <thead>
             <tr>
                 <th>Name</th>
@@ -205,14 +207,14 @@
             </form>
             </tbody>
             </table>
-
-			<table class="table table-hover table-condensed">
+            
+            <table class="table table-hover table-condensed">
 			<thead>
             <tr>
             	<th>ID</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th colspan=2>Action</th>
+                <th colspan="2">Action</th>
             </tr>
 			</thead>
 			
@@ -233,31 +235,32 @@
                 <td><input class="form-control" value="<%=rs.getString("name")%>" name="name" size="15"/></td>
 				<td><input class="form-control" value="<%=rs.getString("description")%>" name="description" size="30"/></td>
 				<%-- Button --%>
-                <td><button type="submit" class="btn btn-primary">Update</button></td>
+                <td><button type="submit" class="btn btn-primary"><i class="icon-repeat icon-large"></i> Update</button></td>
                 </form>
-
-                	<% 
+                
+                <% 
                 	while (rsNP.next()) {
                 		if (rsNP.getString("name").equals(rs.getString("name"))) {
                 	%>
 	                		<form action="categories.jsp" method="POST">
 	                		<input type="hidden" name="action" value="delete"/>
 	                		<input type="hidden" value="<%=rs.getInt("id")%>" name="id"/>
-               	 			<td><button type="submit" class="btn btn-danger">Delete</button></td></form>   
+               	 			<td><button type="submit" class="btn btn-danger"><i class="icon-trash icon-large"></i> Delete</button></td></form>   
                	 	<% 
                 			break;
                 		}
-                		rsNP = pstmtNP.executeQuery();
                 	}
-               	 	%>
+                	rsNP = pstmtNP.executeQuery();
+               	 %>               
             </tr>
-            <% } %>
+         <% } %>
             </tbody>
             </table>
-		</div>
-		</div>
-
-            <%-- -------- Close Connection Code -------- --%>
+        </div>
+        </div>
+        </div>
+    
+    <%-- -------- Close Connection Code -------- --%>
             <%
                 // Close the ResultSet
                 rs.close(); 
@@ -322,13 +325,13 @@
                 }
             }
             %>
-            
+    
 	<!-- Bootstrap core JavaScript
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster 
+    <!-- Placed at the end of the document so the pages load faster-->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>-->
-
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	    
 </body>
 
 </html>

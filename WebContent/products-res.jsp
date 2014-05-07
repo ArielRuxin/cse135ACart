@@ -1,16 +1,94 @@
+<%@ page import="java.util.*, cartitem.*" language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 
-<body>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Ariel&Charlie">
 
+    <title>ACart: Add product</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Add custom CSS here -->
+    <link href="css/navbarstyle.css" rel="stylesheet">
+    <style>
+    body {
+        margin-top: 60px;
+    }
+    </style>
+
+</head>
+
+<body>
 	<%
 		String productname = request.getParameter("name"); 
 		session.setAttribute("productname", productname); 
 	%>
+	
+     <!-- nav bar -->
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="home.jsp"><i class="icon-home"></i> Home</a>
+            </div>
 
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+               	<% 
+            	if(session.getAttribute("username") == null) {
+            	%>
+            		<li class="dropdown">
+                    <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Hello! Login here <b class="caret"></b></a>
+                    	<ul class="dropdown-menu">
+							<li><a href="login.jsp"><i class="icon-user"></i> Login</a></li>
+							<li><a href="signup.jsp"><i class="icon-pencil"></i> Sign up</a></li>
+						</ul>
+                    </li>
+            	<%		
+            	} else {
+            	%>	
+            		<li class="dropdown">
+                    <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Hello <%= session.getAttribute("username") %> <b class="caret"></b></a>
+                    	<ul class="dropdown-menu">
+            		
+            	<% 	if(session.getAttribute("role").equals("Owner")) {
+        		%>       			
+							<li><a href="categories.jsp">Manage categories</a></li>
+							<li><a href="products.jsp">Manage products</a></li>
+					        		
+        		<% 	} else { %>
+        			       					
+        			
+        			<%}%>
+        					<li><a href="product-browse.jsp">Shopping</a></li>
+        					<li><a href="login.jsp">Log out</a></li>
+        				</ul>
+                    </li>
+               
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
 
-<table>
-    <tr>
-        <td>
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+		
             <%-- Import the java.sql package --%>
             <%@ page import="java.sql.*"%>
             <%-- -------- Open Connection Code -------- --%>
@@ -55,11 +133,16 @@
                     conn.setAutoCommit(true);
                 }
             %>
-            <h2>Congratulations</h2>
-			<%= productname %> has been added
-			<br>
-			<br>
-			<a href="products.jsp">Go back</a></li>
+           	<div class="container">
+        		<div class="row">
+            		<div class="col-lg-12">
+						<h5><i class="icon-music"></i> Congratulations! Product '<%= productname %>' has been added. </h5>
+					</div>
+				</div>
+				<div class="col-sm-offset-2 col-sm-10">
+	         		<a href="products.jsp"><button class="btn btn-success" type="button" onclick="products.jsp">Go back</button></a>
+	      		</div>
+			</div>
             
             <%-- -------- Close Connection Code -------- --%>
             <%
@@ -69,8 +152,7 @@
                 // Wrap the SQL exception in a runtime exception to propagate
                 // it upwards
             %>
-            	<h2>Sorry</h2>
-            	Failure to insert new product.
+            	<h5>Sorry! Fail to insert new product. </h5>
             	<br>
 				<br>
 				<a href="products.jsp">Go back</a></li>
@@ -93,10 +175,14 @@
                 }
             }
             %>
-        </table>
-        </td>
-    </tr>
-</table>
+     <% } // if username = null%>
+     
+<!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    
 </body>
 
 </html>
