@@ -43,7 +43,7 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                	<% 
-            	if(session.getAttribute("username") == null) {
+            	if(session.getAttribute("username") == null || session.getAttribute("role") == null) {
             	%>
             		<li class="dropdown">
                     <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Hello! Login here <b class="caret"></b></a>
@@ -52,6 +52,9 @@
 							<li><a href="signup.jsp"><i class="icon-pencil"></i> Sign up</a></li>
 						</ul>
                     </li>
+            </div>
+        </div>
+    </nav>
             	<%		
             	} else {
             	%>	
@@ -66,15 +69,11 @@
 					        		
         		<% 	} else { %>
         			       					
-        			
-        			<%}%>
-        					<li><a href="product-browse.jsp">Shopping</a></li>
+        					<li><a href="product-browse.jsp">Shopping</a></li>        		
+        		<%  }%>        					
         					<li><a href="login.jsp">Log out</a></li>
         				</ul>
-                    </li>
-            	<% }
-            
-            %>                
+                    </li>              
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -83,14 +82,17 @@
     </nav>
 
 <% 
-	/* } */
+
 	String action = request.getParameter("action");
-	/* String cate = null; */
 	if (action != null && action.equals("list")) {
 		session.setAttribute("cate", request.getParameter("cate"));
+		session.setAttribute("cateid", request.getParameter("cateid"));
 		if (!((String)(session.getAttribute("cate"))).equals("no")){
 			session.setAttribute("realcate", request.getParameter("cate"));
-		
+			session.setAttribute("realcateid", request.getParameter("cateid"));
+			session.setAttribute("search", null);
+		} else {
+			session.setAttribute("search", request.getParameter("search"));
 		}
 	}	
 %>
@@ -141,7 +143,7 @@ try {
     Statement statement = conn.createStatement();
     // Use the created statement to SELECT
     // the student attributes FROM the Student table.
-    rsCate = statement.executeQuery("SELECT name FROM categories");                 
+    rsCate = statement.executeQuery("SELECT name, id FROM categories");                 
 %>
 
 	<div class="container">
@@ -150,12 +152,12 @@ try {
 	
 	<div>
 		<span style="float:right">
-			<a href="buyshoppingcart.jsp"><button class="btn btn-success" type="button" onclick="product-browse.jsp"><i class="icon-money icon-large"></i> Pay shopping cart</button></a>
+			<a href="buyshoppingcart.jsp"><button class="btn btn-success" type="button" onclick="buyshoppingcart.jsp"><i class="icon-money icon-large"></i> Pay shopping cart</button></a>
 		</span>
 	</div>
 	<div>
 		<br /><br />
-	<div>
+	</div>
 	
 	
 	<table class="table">
@@ -175,6 +177,7 @@ try {
 			        	<form action="product-browse.jsp" method="POST">
 			        			<input type="hidden" name="action" value="list"/> 
 			        			<input type="hidden" name="cate" value="<%=rsCate.getString("name")%>"/>
+			        			<input type="hidden" name="cateid" value="<%=rsCate.getString("id")%>"/>
 			                    <td><button type="submit" class="btn btn-link"><%=rsCate.getString("name")%></button></td>
 			        	</form>
 			        </tr>
@@ -187,6 +190,7 @@ try {
 			        	<form action="product-browse.jsp" method="POST">
 			        		<input type="hidden" name="action" value="list"/> 
 			        		<input type="hidden" name="cate" value="All"/>
+			        		<input type="hidden" name="cateid" value="0"/>
 			                <td><button type="submit" class="btn btn-default btn-sm">Show all</button></td>
 			        	</form>
 			        </tr>
@@ -198,8 +202,9 @@ try {
 		     	<form action="product-browse.jsp" method="POST">
                    <input type="hidden" name="action" value="list"/>
                    <input type="hidden" name="cate" value="no"/>
+                   <input type="hidden" name="cateid" value="no"/>
                    <div class="input-group">
-				   <input type="text" class="form-control" placeholder="Search" size="30"/>
+				   <input name="search" type="text" class="form-control" placeholder="Search" size="30"/>
    						<span class="input-group-btn">
      						<button class="btn btn-default" type="submit"><i class="icon-search"></i> Search</button>
    						</span>
@@ -210,7 +215,7 @@ try {
 		<tr>
 			<td><h4>Category: 
 				<% if((session.getAttribute("realcate")==null)) {
-				%> null <% 
+				%>  All <% 
 				} else {
 				%> <%=session.getAttribute("realcate") %> <% 
 				}
@@ -231,13 +236,11 @@ try {
 		     		       	newCartitem.setAmount( (cartitem.get(request.getParameter("itemname"))).getAmount()+ Integer.parseInt(request.getParameter("amount")));                   
 		     		       	itemnumber--;
 		          	 } else {
-			          // add the attributes from the request object to new student
 			           newCartitem.setId(Integer.parseInt(request.getParameter("id")));                   
 					   newCartitem.setNo(Integer.parseInt(request.getParameter("no")));                   
 			           newCartitem.setItemname(request.getParameter("itemname"));
 			           newCartitem.setPrice(Float.parseFloat(request.getParameter("price")));
 				       newCartitem.setAmount(Integer.parseInt(request.getParameter("amount")));                   
-			          // add new student to the map
 		       		  } cartitem.put(request.getParameter("itemname"), newCartitem);
 			           itemnumber++;
 			           session.setAttribute("itemnumber", itemnumber);
@@ -246,8 +249,7 @@ try {
           
             <%-- -------- LIST Code -------- --%>
             <%
-/*                  action = request.getParameter("action");
- */                // Check if an insertion is requested
+                // Check if an insertion is requested
                 if (action != null && action.equals("list")) {                	
                 	
                 	if (((String) (session.getAttribute("cate"))).equals("All")) {
@@ -258,17 +260,17 @@ try {
                     // INSERT student values INTO the students table.
                     	if (session.getAttribute("realcate")==null || ((String) (session.getAttribute("realcate"))).equals("All")) {
                     		pstmtL = conn.prepareStatement("SELECT * FROM products WHERE name ILIKE ?");
- 	                    	pstmtL.setString(1, "%" + request.getParameter("search") + "%");
+ 	                    	pstmtL.setString(1, "%" + (String)(session.getAttribute("search")) + "%");
                         	rsC = pstmtL.executeQuery(); 
                     	} else {
-                    		pstmtL = conn.prepareStatement("SELECT * FROM products WHERE name ILIKE ? AND category = ?");
- 	                    	pstmtL.setString(1, "%" + request.getParameter("search") + "%");
- 	                    	pstmtL.setString(2, (String) (session.getAttribute("realcate"))); 
+                    		pstmtL = conn.prepareStatement("SELECT * FROM products WHERE name ILIKE ? AND categoryid = ?");
+ 	                    	pstmtL.setString(1, "%" + (String)(session.getAttribute("search")) + "%");
+ 	                    	pstmtL.setInt(2, Integer.parseInt((String)(session.getAttribute("realcateid")))); 
 							rsC = pstmtL.executeQuery(); 
                     	}
 					} else {
-                        pstmtL = conn.prepareStatement("SELECT * FROM products WHERE products.category = ?");
- 						pstmtL.setString(1, (String) (session.getAttribute("cate")));                    
+                        pstmtL = conn.prepareStatement("SELECT * FROM products WHERE products.categoryid = ?");
+                        pstmtL.setInt(1, Integer.parseInt((String)(session.getAttribute("cateid"))));                    
                         rsC = pstmtL.executeQuery(); 
 					} %>
 					
@@ -291,7 +293,7 @@ try {
 		          		</tr>
 		          		</thead>
 		          		<tbody>	<% 
-		          		 		rsC = pstmtL.executeQuery(); 
+		          		 	rsC = pstmtL.executeQuery(); 
 							while (rsC.next()) {  %>
 						<tr>
 			                <form action="product-order.jsp" method="POST">
@@ -303,7 +305,18 @@ try {
 								<td><%=rsC.getInt("id")%></td>
 			                    <td><%=rsC.getString("name")%></td>
 			                	<td><%=rsC.getInt("sku")%></td>
-			                	<td><%=rsC.getString("category")%></td>
+			                	<td>
+									<%
+			                    	rsCate = statement.executeQuery("SELECT name, id FROM categories"); 
+						 			String curcate = null;
+			                    	while(rsCate.next()) {
+						 				if (rsC.getInt("categoryid")==(rsCate.getInt("id"))){
+			                    			curcate = rsCate.getString("name");
+						 				}
+			                    	}                   	
+			                    	%>
+			                    	<%=curcate%>
+			                	</td>
 			                    <td>$ <%=rsC.getFloat("price")%></td>
 			                    <%-- Button --%>
 			                    <td><button type="submit" class="btn btn-primary btn-sm"><i class="icon-shopping-cart icon-large"></i> Buy</td>
@@ -318,14 +331,18 @@ try {
 		</tr>
         <% } %>
 	</table>
+	</div>
+	</div>
+	</div>
 			
 			<%-- -------- Close Connection Code -------- --%>
             <%
                 // Close the ResultSet
                 rsCate.close();
-            	/* rsC.close(); */
+            	//rsC.close();
                 // Close the Statement
                 //pstmt.close();
+                //pstmtL.close();
 
                 // Close the Connection
                 conn.close();
@@ -333,7 +350,7 @@ try {
 
                 // Wrap the SQL exception in a runtime exception to propagate
                 // it upwards
-                throw new RuntimeException(e);
+                throw e;
             } finally {
                 // Release resources in a finally block in reverse-order of
                 // their creation
@@ -356,7 +373,7 @@ try {
                     conn = null;
                 }
             }
-   
+}    
             %>
 
 	<!-- Bootstrap core JavaScript

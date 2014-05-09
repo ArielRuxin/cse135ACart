@@ -1,4 +1,4 @@
-<%@ page import="java.util.*, cartitem.*" language="java" contentType="text/html; charset=ISO-8859-1"
+<%@ page import="java.sql.*" import="java.util.*, cartitem.*" language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -26,12 +26,7 @@
 </head>
 
 <body>
-	<%
-		String productname = request.getParameter("name"); 
-		session.setAttribute("productname", productname); 
-	%>
-	
-     <!-- nav bar -->
+	<!-- nav bar -->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -70,10 +65,10 @@
 							<li><a href="products.jsp">Manage products</a></li>
 					        		
         		<% 	} else { %>
-        			       					
+        		
+        			       	<li><a href="product-browse.jsp">Shopping</a></li>				
         			
-        			<%}%>
-        					<li><a href="product-browse.jsp">Shopping</a></li>
+        			<%}%>       					
         					<li><a href="login.jsp">Log out</a></li>
         				</ul>
                     </li>
@@ -89,10 +84,16 @@
 <div class="row">
 <div class="col-lg-12">
 		
-            <%-- Import the java.sql package --%>
-            <%@ page import="java.sql.*"%>
-            <%-- -------- Open Connection Code -------- --%>
             <%
+            if (request.getParameter("action")==null) {
+        		%>
+        		<a href="login-res.jsp"> Please try to manage products </a>
+        		<%
+        	} else {
+        	
+        	
+        		String productname = request.getParameter("name"); 
+        		session.setAttribute("productname", productname); 
             
             Connection conn = null;
             PreparedStatement pstmt = null;
@@ -120,12 +121,19 @@
                     // Create the prepared statement and use it to
                     // INSERT student values INTO the students table.
                     pstmt = conn
-                    .prepareStatement("INSERT INTO products (name, sku, category, price) VALUES (?, ?, ?, ?)");
+                            .prepareStatement("INSERT INTO products (name, sku, categoryid, price) VALUES (?, ?, ?, ?)");
 
-                    pstmt.setString(1, request.getParameter("name"));
-                    pstmt.setInt(2, Integer.parseInt(request.getParameter("sku")));                    
-                    pstmt.setString(3, request.getParameter("category"));
-                    pstmt.setFloat(4, Float.parseFloat(request.getParameter("price")));                    
+                    if(!request.getParameter("name").equals("")){
+                    	pstmt.setString(1, request.getParameter("name"));
+                    }
+                    if(!request.getParameter("sku").equals("")){
+                        pstmt.setString(2, request.getParameter("sku"));
+                    }
+                    
+                 	pstmt.setInt(3, Integer.parseInt(request.getParameter("categoryid")));
+                 	if(!request.getParameter("price").equals("")){
+                        pstmt.setFloat(4, Float.parseFloat(request.getParameter("price")));                    
+                    }
                     int rowCount = pstmt.executeUpdate();
 
                     // Commit transaction
@@ -174,8 +182,8 @@
                     conn = null;
                 }
             }
-            %>
-     <% } // if username = null%>
+        } //request.getParameter("action")!=null
+     } // if username = null%>
      
 <!-- Bootstrap core JavaScript
     ================================================== -->

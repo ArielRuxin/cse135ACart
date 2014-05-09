@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+<%@ page import="java.sql.*" language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -32,17 +32,20 @@
 		
 	<%
 		String action = request.getParameter("action");
-		/* String cate = null; */
 		if (action != null && action.equals("list")) {
 			session.setAttribute("cate", request.getParameter("cate"));
+			session.setAttribute("cateid", request.getParameter("cateid"));
+			
 			if (!((String)(session.getAttribute("cate"))).equals("no")){
 				session.setAttribute("realcate", request.getParameter("cate"));
-			
+				session.setAttribute("realcateid", request.getParameter("cateid"));
+				session.setAttribute("search", null);
+
+			} else{
+				session.setAttribute("search", request.getParameter("search"));
 			}
 		}
 	%>
-            <%-- Import the java.sql package --%>
-            <%@ page import="java.sql.*"%>
             <%-- -------- Open Connection Code -------- --%>
             <%
             
@@ -50,6 +53,7 @@
             PreparedStatement pstmt = null;
             PreparedStatement pstmtL = null; 
             PreparedStatement pstmtU = null; 
+            PreparedStatement pstmtCID = null;             
             ResultSet rsCate = null;
             ResultSet rsC = null;
             
@@ -69,7 +73,7 @@
                 Statement statement = conn.createStatement();
                 // Use the created statement to SELECT
                 // the student attributes FROM the Student table.
-                rsCate = statement.executeQuery("SELECT name FROM categories");                 
+                rsCate = statement.executeQuery("SELECT name, id FROM categories");                 
             %>
             
             <%-- -------- UPDATE Code -------- --%>
@@ -83,33 +87,19 @@
                     // Create the prepared statement and use it to
                     // UPDATE student values in the Students table.
                     pstmt = conn
-                        .prepareStatement("UPDATE products SET name = ?, sku = ?, category = ?, price = ? WHERE id = ?");
+                        .prepareStatement("UPDATE products SET name = ?, sku = ?, categoryid = ?, price = ? WHERE id = ?");
 
                     pstmt.setString(1, request.getParameter("name"));
-                    pstmt.setInt(2, Integer.parseInt(request.getParameter("sku")));
-                    pstmt.setString(3, request.getParameter("category"));
+                    pstmt.setString(2, request.getParameter("sku"));
+                    pstmt.setInt(3, Integer.parseInt(request.getParameter("categoryid")));                    
                     pstmt.setFloat(4, Float.parseFloat(request.getParameter("price")));                    
                     pstmt.setInt(5, Integer.parseInt(request.getParameter("id")));
 
-                    %>
-                    	Welcome<%= session.getAttribute("cate") %>
-                    <% 
                     int rowCount = pstmt.executeUpdate();
 					
                     // Commit transaction
                     conn.commit();
                     conn.setAutoCommit(true);
-                    if (session.getAttribute("cate").equals("All")) {
-                    	pstmtU = conn.prepareStatement("SELECT * FROM products");
-     					rsC = pstmtU.executeQuery(); 
-
-                    } else {
-                    	pstmtU = conn.prepareStatement("SELECT * FROM products WHERE products.category = ?");
- 						pstmtU.setString(1, (String) (session.getAttribute("cate")));     
- 	 					rsC = pstmtU.executeQuery(); 
-
-                    }
-                    /* session.setAttribute("cate", request.getParameter("category"));  */
                 }
             %>
             
@@ -132,47 +122,31 @@
                     // Commit transaction
                     conn.commit();
                     conn.setAutoCommit(true);
-                    if (session.getAttribute("cate").equals("All")) {
-                    	pstmtU = conn.prepareStatement("SELECT * FROM products");
-     					rsC = pstmtU.executeQuery(); 
-
-                    } else {
-                    	pstmtU = conn.prepareStatement("SELECT * FROM products WHERE products.category = ?");
- 						pstmtU.setString(1, (String) (session.getAttribute("cate")));     
- 	 					rsC = pstmtU.executeQuery(); 
-
-                    } 
                 }
             %>
             
             <%-- -------- LIST Code -------- --%>
             <%
-/*                  action = request.getParameter("action");
- */                // Check if an insertion is requested
-                if (action != null && action.equals("list")) {                	
-                	
-                	if (((String) (session.getAttribute("cate"))).equals("All")) {
-						 pstmtL = conn.prepareStatement("SELECT * FROM products");
-                 	     rsC = pstmtL.executeQuery(); 
-					} else if (((String) (session.getAttribute("cate"))).equals("no")) {
-                    // Create the prepared statement and use it to
-                    // INSERT student values INTO the students table.
-                    	if (session.getAttribute("realcate")==null || ((String) (session.getAttribute("realcate"))).equals("All")) {
-                    		pstmtL = conn.prepareStatement("SELECT * FROM products WHERE name ILIKE ?");
- 	                    	pstmtL.setString(1, "%" + request.getParameter("search") + "%");
-                        	rsC = pstmtL.executeQuery(); 
-                    	} else {
-                    		pstmtL = conn.prepareStatement("SELECT * FROM products WHERE name ILIKE ? AND category = ?");
- 	                    	pstmtL.setString(1, "%" + request.getParameter("search") + "%");
- 	                    	pstmtL.setString(2, (String) (session.getAttribute("realcate"))); 
+	            if (((String) (session.getAttribute("cate"))).equals("All")) {
+					 pstmtL = conn.prepareStatement("SELECT * FROM products");
+					 rsC = pstmtL.executeQuery(); 
+				} else if (((String) (session.getAttribute("cate"))).equals("no")) {
+					
+	               	if (session.getAttribute("realcate")==null || ((String) (session.getAttribute("realcate"))).equals("All")) {
+	               		pstmtL = conn.prepareStatement("SELECT * FROM products WHERE name ILIKE ?");
+	                    	pstmtL.setString(1, "%" + (String)(session.getAttribute("search")) + "%");
+	                   		rsC = pstmtL.executeQuery(); 
+	               	} else {
+	               		pstmtL = conn.prepareStatement("SELECT * FROM products WHERE name ILIKE ? AND categoryid = ?");
+	                    	pstmtL.setString(1, "%" + (String)(session.getAttribute("search")) + "%");
+	                        pstmtL.setInt(2, Integer.parseInt((String)(session.getAttribute("realcateid"))));
 							rsC = pstmtL.executeQuery(); 
-                    	}
-					} else {
-                        pstmtL = conn.prepareStatement("SELECT * FROM products WHERE products.category = ?");
- 						pstmtL.setString(1, (String) (session.getAttribute("cate")));                    
-                        rsC = pstmtL.executeQuery(); 
-					}
-                }
+	               	}
+				} else {
+	              pstmtL = conn.prepareStatement("SELECT * FROM products WHERE products.categoryid = ?");
+	              pstmtL.setInt(1, Integer.parseInt((String)(session.getAttribute("cateid"))));
+	              rsC = pstmtL.executeQuery(); 
+				}
              %>
              
 <div class="container">
@@ -198,10 +172,11 @@
         <td>
              
              <% 
-                if(!(rsC.next())|| ((String)(session.getAttribute("cate"))).equals("no") && (request.getParameter("search").equals("")))
-                { %>
-                    <p class="text-danger">No products in this category!</p>
-             <% } else {
+			if(!(rsC.next())|| ((String)(session.getAttribute("cate"))).equals("no") && ((String)(session.getAttribute("search"))).equals(""))
+			{ %>
+			    <p class="text-danger">No products in this category!</p>
+			    <% session.setAttribute("realcate", "All");                   
+             } else {
                 // Iterate over the ResultSet
              %>
            	<table class="table table-bordered table-hover">
@@ -220,7 +195,6 @@
                 rsC = pstmtL.executeQuery(); 
                 while (rsC.next()) {
             	%>
-
             <tr>
                 <form action="product-search.jsp" method="POST">
                     <input type="hidden" name="action" value="update"/>
@@ -230,16 +204,17 @@
 					<td><%=rsC.getInt("id")%></td>
                     <td><input class="form-control" value="<%=rsC.getString("name")%>" name="name" size="15"/></td>
                 	<td><input class="form-control" value="<%=rsC.getInt("sku")%>" name="sku" size="10"/></td>               	
-                    <td><select name="category" class="form-control">
-                    	<option selected="<%=rsC.getString("category")%>"><%=rsC.getString("category")%></option>
+                    <td><select name="categoryid" class="form-control">
 			 			<%	
-			 			rsCate = statement.executeQuery("SELECT name FROM categories"); 
+			 			rsCate = statement.executeQuery("SELECT name, id FROM categories");
+			 			String curcate = null;
 			 			while(rsCate.next()) {
-			 				if (!rsC.getString("category").equals(rsCate.getString("name"))){
-			  			%>
-			  				<option value=<%= rsCate.getString("name") %>><%= rsCate.getString("name")%></option>
+			 				if (rsC.getInt("categoryid") == rsCate.getInt("id")){
+			 					curcate = rsCate.getString("name");
+			  				%>
+			  					<option value="<%=(rsCate.getInt("id"))%>" selected="<%=(rsCate.getInt("id"))%>"><%=rsCate.getString("name")%></option>
 			  				<%
-			  				}
+			  				} 
 			 			}
 			   			%>
 						</select>

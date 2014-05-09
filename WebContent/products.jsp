@@ -57,7 +57,7 @@
                 Statement statement = conn.createStatement();
                 // Use the created statement to SELECT
                 // the student attributes FROM the Student table.
-                rsCate = statement.executeQuery("SELECT name FROM categories"); 
+                rsCate = statement.executeQuery("SELECT id, name FROM categories"); 
              
                 
             %>
@@ -103,10 +103,8 @@
         		
         		<% 	} else { %>       			
         			<li><a href="#">Hello <%= session.getAttribute("username") %></a></li>        			
-        			<%}
-            	}
-            
-            %>                
+        			<%}%>
+                            
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -135,6 +133,7 @@
 		        	<form action="product-search.jsp" method="POST">
 		        			<input type="hidden" name="action" value="list"/> 
 		        			<input type="hidden" name="cate" value="<%=rsCate.getString("name")%>"/>
+		        			<input type="hidden" name="cateid" value="<%=rsCate.getString("id")%>"/>
 		                    <td><button type="submit" class="btn btn-link"><%=rsCate.getString("name")%></button></td>
 		        	</form>
 		        </tr>
@@ -145,7 +144,8 @@
 	        <tfoot>	        
 		        <tr>
 		        	<form action="product-search.jsp" method="POST">
-		        		<input type="hidden" name="action" value="list"/> 
+		        		<input type="hidden" name="action" value="list"/>
+		        		<input type="hidden" name="cateid" value="0"/>
 		        		<input type="hidden" name="cate" value="All"/>
 		                <td><button type="submit" class="btn btn-default btn-sm">Show all</button></td>
 		        	</form>
@@ -158,7 +158,7 @@
                    <input type="hidden" name="action" value="list"/>
                    <input type="hidden" name="cate" value="no"/>
                    <div class="input-group">
-					<input type="text" class="form-control" placeholder="Search" size="30"/>
+					<input name="search" type="text" class="form-control" placeholder="Search" size="30"/>
      						<span class="input-group-btn">
        						<button class="btn btn-default" type="submit"><i class="icon-search"></i> Search</button>
      						</span>
@@ -183,12 +183,12 @@
 	                    <input type="hidden" name="action" value="insert"/>
 	                    <td><input class="form-control" value="" name="name" size="20"/></td>
 	                    <td><input class="form-control" value="" name="sku" size="10"/></td>
-	                    <td><select class="form-control" name="category">
+	                    <td><select class="form-control" name="categoryid">
 				 		<%	
-				 			rsCate = statement.executeQuery("SELECT name FROM categories"); 
+				 			rsCate = statement.executeQuery("SELECT name, id FROM categories"); 
 				 			while(rsCate.next()) {
 				  		%>
-				  		<option value=<%= rsCate.getString("name") %>><%= rsCate.getString("name")%></option>
+				  		<option value=<%= rsCate.getString("id") %>><%= rsCate.getString("name")%></option>
 				  		<%
 				  		}
 				   			%>
@@ -207,7 +207,7 @@
 </div>
 </div>
 </div>
-        	
+            <% } %>       	
 
             <%-- -------- Close Connection Code -------- --%>
             <%

@@ -77,8 +77,8 @@
         		
         		<% 	} else { %>        			
         			<li><a href="#">Hello <%= session.getAttribute("username") %></a></li>       			
-        			<%}
-            	}%>                
+        			<%}%>
+            	                
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -107,7 +107,6 @@
 	            <th>Price</th>
 	            <th>Quantity</th>
 	            <th>Total</th>
-	            <!-- <th>Total</th> -->
 	        </tr>
         </thead>
 
@@ -153,7 +152,7 @@
 </div>
 </div>
 </div>
-
+<% } %>
 	<!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

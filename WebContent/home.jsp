@@ -65,16 +65,12 @@
 							<li><a href="products.jsp">Manage products</a></li>
 					        		
         		<% 	} else { %>
-        			       					
-        			
-        			<%}%>
-        					<li><a href="product-browse.jsp">Shopping</a></li>
+        			       	<li><a href="product-browse.jsp">Shopping</a></li>				       			
+        			<%}%>        					
         					<li><a href="login.jsp">Log out</a></li>
         				</ul>
                     </li>
-            	<% }
-            
-            %>                
+            	<% } %>                
                 </ul>
             </div>
             <!-- /.navbar-collapse -->

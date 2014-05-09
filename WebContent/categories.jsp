@@ -67,10 +67,8 @@
         		
         		<% 	} else { %>       			
         			<li><a href="#">Hello <%= session.getAttribute("username") %></a></li>        			
-        			<%}
-            	}
-            
-           %>                
+        		<%	}  %>
+               
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -136,9 +134,8 @@
                     pstmt = conn
                         .prepareStatement("UPDATE categories SET name = ?, description = ? WHERE id = ?");
 
-                    if(!request.getParameter("name").equals("")){
-                    	pstmt.setString(1, request.getParameter("name"));
-                    }
+                    
+                    pstmt.setString(1, request.getParameter("name"));
                     pstmt.setString(2, request.getParameter("description"));
                     pstmt.setInt(3, Integer.parseInt(request.getParameter("id")));
                     
@@ -181,7 +178,7 @@
                 // the student attributes FROM the Student table.
                 rs = statement.executeQuery("SELECT * FROM categories");
                 
-                pstmtNP = conn.prepareStatement("SELECT categories.name FROM categories WHERE categories.name NOT IN(SELECT category FROM products)");
+                pstmtNP = conn.prepareStatement("SELECT categories.name FROM categories WHERE categories.id NOT IN(SELECT categoryid FROM products)");
                 rsNP = pstmtNP.executeQuery();
              %>
              
@@ -276,7 +273,7 @@
 
                 // Wrap the SQL exception in a runtime exception to propagate
                 // it upwards
-                //throw e;
+               	//throw e;
             %>
             	<div class="container">
 	        		<div class="row">
@@ -324,8 +321,9 @@
                     conn = null;
                 }
             }
-            %>
-    
+
+}
+%>     
 	<!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster-->

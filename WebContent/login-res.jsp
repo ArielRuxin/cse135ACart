@@ -32,6 +32,7 @@
             <%-- -------- Open Connection Code -------- --%>
             <%
             if((session.getAttribute("username")==null) || (!(session.getAttribute("username")==null) && !((String)(session.getAttribute("username"))).equals(request.getParameter("username")))) {
+            	session.setAttribute("role", null);
             	session.setAttribute("cartitem", null);
                 session.setAttribute("itemnumber", null);
             }
@@ -54,7 +55,15 @@
 
             <%-- -------- SELECT Statement Code -------- --%>
             <%
-            loginuser = request.getParameter("username");
+            String action = request.getParameter("action");
+            if (action != null && action.equals("checkuser")) {
+            	
+ 				loginuser = request.getParameter("username");
+ 				// record the empty case
+ 				session.setAttribute("username", loginuser);
+            
+            }
+            //loginuser = request.getParameter("username");
 
             // Create the statement
             pstmt = conn.prepareStatement("SELECT name, role FROM users WHERE users.name = ?");
@@ -146,7 +155,7 @@
 						<div class="col-sm-offset-2 col-sm-10">
 						<%		if((session.getAttribute("username")) == null) { %>
              						<p>Please login first</p>
-             			<% 		} else if (((String)(session.getAttribute("username"))).equals("")){ %>
+             			<% 		} else if (session.getAttribute("username").equals("")){ %>
              						<p>The provided name cannot be empty</p>
              			<%		} else {%>
 									<p>The provided name <%=loginuser %> doesn't exist</p>
