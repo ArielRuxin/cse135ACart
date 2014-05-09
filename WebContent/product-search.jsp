@@ -203,7 +203,7 @@
                 <%-- Get the id --%>
 					<td><%=rsC.getInt("id")%></td>
                     <td><input class="form-control" value="<%=rsC.getString("name")%>" name="name" size="15"/></td>
-                	<td><input class="form-control" value="<%=rsC.getInt("sku")%>" name="sku" size="10"/></td>               	
+                	<td><input class="form-control" value="<%=rsC.getString("sku")%>" name="sku" size="10"/></td>               	
                     <td><select name="categoryid" class="form-control">
 			 			<%	
 			 			rsCate = statement.executeQuery("SELECT name, id FROM categories");

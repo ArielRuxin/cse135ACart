@@ -304,7 +304,7 @@ try {
 		
 								<td><%=rsC.getInt("id")%></td>
 			                    <td><%=rsC.getString("name")%></td>
-			                	<td><%=rsC.getInt("sku")%></td>
+			                	<td><%=rsC.getString("sku")%></td>
 			                	<td>
 									<%
 			                    	rsCate = statement.executeQuery("SELECT name, id FROM categories"); 

@@ -154,11 +154,11 @@
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 						<%		if((session.getAttribute("username")) == null) { %>
-             						<p>Please login first</p>
+             						<p class="text-danger">Please login first</p>
              			<% 		} else if (session.getAttribute("username").equals("")){ %>
-             						<p>The provided name cannot be empty</p>
+             						<p class="text-danger">The provided name cannot be empty</p>
              			<%		} else {%>
-									<p>The provided name <%=loginuser %> doesn't exist</p>
+									<p class="text-danger">The provided name <%=loginuser %> doesn't exist</p>
 						<% 		} %>
 						</div>
 					</div>
